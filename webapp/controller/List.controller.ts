@@ -42,9 +42,12 @@ export default class List extends Controller {
     }
 
     /**
-     * Iterate the tickets currently in the table and run Summarizer +
-     * LanguageDetector on each. Structured classification (Prompt API) is
-     * added in exercise-4.
+     * Iterate the tickets currently in the table and run three AI operations:
+     *   1. Summarizer + LanguageDetector (concurrently)
+     *   2. If not English → Translator (source → en) to feed the classifier
+     *   3. Prompt API with `responseConstraint` (JSON Schema) → {sentiment, category, priority}
+     *
+     * All results are cached in the shared `ai>/results/<ID>` bag.
      */
     public async onAnalyzeAll(): Promise<void> {
         const oAiModel = (this.getOwnerComponent() as UIComponent).getModel("ai") as any;
@@ -58,7 +61,7 @@ export default class List extends Controller {
                 if (!oCtx) continue;
                 const id: string = oCtx.getProperty("ID");
                 const body: string = oCtx.getProperty("body") || "";
-                if (!body || (oAiModel.getProperty("/results")[id]?.summary)) continue;
+                if (!body || (oAiModel.getProperty("/results")[id]?.priority)) continue;
 
                 const [langs, summary] = await Promise.all([
                     ai.detectLanguage(body).catch(() => [{ detectedLanguage: "und", confidence: 0 }]),
@@ -66,6 +69,18 @@ export default class List extends Controller {
                 ]);
                 const language = langs[0]?.detectedLanguage ?? "und";
                 this._setResult(oAiModel, id, { language, summary });
+
+                // Translate to English if needed so the classifier sees consistent input
+                const bodyEn = language === "en" || language === "und"
+                    ? body
+                    : await ai.translate(body, language, "en").catch(() => body);
+
+                const cls = await ai.classify(bodyEn).catch((e: Error) => {
+                    // eslint-disable-next-line no-console
+                    console.warn("classify failed", e);
+                    return null;
+                });
+                if (cls) this._setResult(oAiModel, id, cls);
             }
             MessageToast.show("Analysis complete");
         } finally {

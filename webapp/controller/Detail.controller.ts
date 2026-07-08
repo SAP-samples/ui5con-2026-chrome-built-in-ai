@@ -93,9 +93,9 @@ export default class Detail extends Controller {
     }
 
     /**
-     * Run Summarizer + LanguageDetector for this ticket and store the result
-     * in the shared `ai>/results/<ID>` bag. exercise-4 adds Prompt-API
-     * structured classification here.
+     * Run Summarizer + LanguageDetector for this ticket, then translate to
+     * English if needed, then classify with the Prompt API using a JSON
+     * Schema (`responseConstraint`). Result goes into `ai>/results/<ID>`.
      */
     public async onAnalyze(): Promise<void> {
         const oCtx = this.getView()?.getBindingContext();
@@ -110,11 +110,19 @@ export default class Detail extends Controller {
                 ai.detectLanguage(body),
                 ai.summarize(body)
             ]);
+            const language = langs[0]?.detectedLanguage ?? "und";
+
+            const bodyEn = language === "en" || language === "und"
+                ? body
+                : await ai.translate(body, language, "en").catch(() => body);
+            const cls = await ai.classify(bodyEn).catch(() => null);
+
             const results = { ...oAiModel.getProperty("/results") };
             results[id] = {
                 ...(results[id] ?? {}),
-                language: langs[0]?.detectedLanguage ?? "und",
-                summary
+                language,
+                summary,
+                ...(cls ?? {})
             };
             oAiModel.setProperty("/results", results);
             MessageToast.show("Analyzed");
