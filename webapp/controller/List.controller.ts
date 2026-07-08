@@ -2,7 +2,9 @@ import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import Event from "sap/ui/base/Event";
 import MessageToast from "sap/m/MessageToast";
-import { ai } from "../model/ai";
+import ResourceModel from "sap/ui/model/resource/ResourceModel";
+import type ResourceBundle from "sap/base/i18n/ResourceBundle";
+import { ai, type AiHooks } from "../model/ai";
 
 /**
  * List Report — the support inbox.
@@ -53,8 +55,29 @@ export default class List extends Controller {
         const oAiModel = (this.getOwnerComponent() as UIComponent).getModel("ai") as any;
         const oTable = this.byId("ticketTable") as any;
         const aItems = oTable.getItems();
+        const oBundle = ((this.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel)
+            .getResourceBundle() as ResourceBundle;
+
+        // Only rows that still need analysis — used for the "n/total" progress label
+        const pending = aItems.filter((oItem: any) => {
+            const oCtx = oItem.getBindingContext();
+            const id: string = oCtx?.getProperty("ID");
+            const body: string = oCtx?.getProperty("body") || "";
+            return body && !(oAiModel.getProperty("/results")[id]?.priority);
+        });
+        const total = pending.length;
+        let done = 0;
+
+        // Piped into every ai.* call so first-run model downloads move the ProgressIndicator
+        const hooks: AiHooks = {
+            onProgress: (pct: number) => oAiModel.setProperty("/progress", pct)
+        };
+        const setStage = (key: string): void => oAiModel.setProperty("/busyText",
+            oBundle.getText(key, [String(done + 1), String(total)]) as string);
 
         oAiModel.setProperty("/busy", true);
+        oAiModel.setProperty("/progress", 0);
+        oAiModel.setProperty("/busyText", oBundle.getText("ai.busy.analyzing", ["0", String(total)]) as string);
         try {
             for (const oItem of aItems) {
                 const oCtx = oItem.getBindingContext();
@@ -63,28 +86,36 @@ export default class List extends Controller {
                 const body: string = oCtx.getProperty("body") || "";
                 if (!body || (oAiModel.getProperty("/results")[id]?.priority)) continue;
 
+                setStage("ai.busy.analyzing");
                 const [langs, summary] = await Promise.all([
-                    ai.detectLanguage(body).catch(() => [{ detectedLanguage: "und", confidence: 0 }]),
-                    ai.summarize(body).catch((e: Error) => `(summary failed: ${e.message})`)
+                    ai.detectLanguage(body, hooks).catch(() => [{ detectedLanguage: "und", confidence: 0 }]),
+                    ai.summarize(body, hooks).catch((e: Error) => `(summary failed: ${e.message})`)
                 ]);
                 const language = langs[0]?.detectedLanguage ?? "und";
                 this._setResult(oAiModel, id, { language, summary });
 
                 // Translate to English if needed so the classifier sees consistent input
-                const bodyEn = language === "en" || language === "und"
-                    ? body
-                    : await ai.translate(body, language, "en").catch(() => body);
+                let bodyEn = body;
+                if (language !== "en" && language !== "und") {
+                    oAiModel.setProperty("/busyText", oBundle.getText("ai.busy.translating") as string);
+                    bodyEn = await ai.translate(body, language, "en", hooks).catch(() => body);
+                }
 
-                const cls = await ai.classify(bodyEn).catch((e: Error) => {
+                oAiModel.setProperty("/busyText", oBundle.getText("ai.busy.classifying") as string);
+                const cls = await ai.classify(bodyEn, hooks).catch((e: Error) => {
                     // eslint-disable-next-line no-console
                     console.warn("classify failed", e);
                     return null;
                 });
                 if (cls) this._setResult(oAiModel, id, cls);
+
+                done++;
             }
             MessageToast.show("Analysis complete");
         } finally {
             oAiModel.setProperty("/busy", false);
+            oAiModel.setProperty("/busyText", "");
+            oAiModel.setProperty("/progress", 0);
         }
     }
 

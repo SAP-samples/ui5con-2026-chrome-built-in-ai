@@ -15,6 +15,18 @@
                 text="{= ${ai>/mock} ? 'MOCK MODE' : ${ai>/summarizer} }"
                 state="{= ${ai>/mock} ? 'Warning' : (${ai>/summarizer} === 'available' ? 'Success' : 'Error') }"
                 class="sapUiSmallMarginEnd"/>
+            <Text
+                visible="{= !!${ai>/busy} }"
+                text="{ai>/busyText}"
+                class="sapUiSmallMarginEnd"/>
+            <ProgressIndicator
+                visible="{= !!${ai>/busy} &amp;&amp; ${ai>/progress} &gt; 0 &amp;&amp; ${ai>/progress} &lt; 1 }"
+                percentValue="{= ${ai>/progress} * 100 }"
+                displayValue="{i18n>ai.progress}"
+                showValue="true"
+                state="Information"
+                width="14rem"
+                class="sapUiSmallMarginEnd"/>
             <Button
                 id="btnAnalyzeAll"
                 text="{i18n>button.analyzeAll}"
@@ -31,6 +43,8 @@
         <content>
             <Table
                 id="ticketTable"
+                busy="{ai>/busy}"
+                busyIndicatorDelay="0"
                 items="{
                     path: '/Tickets',
                     parameters: {

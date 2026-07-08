@@ -27,6 +27,10 @@ export default class Component extends UIComponent {
             languageModel: "unknown",
             downloadPct: 0,
             busy: false,
+            // Human-readable label for the current AI stage (e.g. "Summarizing 3 / 8")
+            busyText: "",
+            // 0..1 progress from Chrome model downloads (monitor.downloadprogress)
+            progress: 0,
             mock: new URLSearchParams(location.search).has("mock"),
             // Enrichment cache: results[ticketId] = { language, summary, sentiment, category, priority }
             results: {}
