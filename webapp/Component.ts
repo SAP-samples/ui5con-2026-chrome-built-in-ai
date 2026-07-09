@@ -27,8 +27,11 @@ export default class Component extends UIComponent {
             languageModel: "unknown",
             downloadPct: 0,
             busy: false,
-            mock: new URLSearchParams(location.search).has("mock")
+            mock: new URLSearchParams(location.search).has("mock"),
+            // Enrichment cache: results[ticketId] = { language, summary, sentiment, category, priority }
+            results: {}
         });
+        oAiModel.setSizeLimit(1000);
         this.setModel(oAiModel, "ai");
 
         // Kick off routing after models are attached

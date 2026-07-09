@@ -57,15 +57,17 @@
                             <Text text="{customer}"/>
                             <Text text="{subject}"/>
                             <ObjectStatus
-                                text="{= ${detectedLanguage} || '—' }"
-                                state="{= ${detectedLanguage} ? 'Information' : 'None' }"/>
-                            <Text text="{= ${summary} || '' }" maxLines="2"/>
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtLanguage'}"
+                                state="Information"/>
+                            <Text
+                                maxLines="2"
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSummary'}"/>
                             <ObjectStatus
-                                text="{= ${sentiment} || '—' }"
-                                state="{= ${sentiment} === 'positive' ? 'Success' : (${sentiment} === 'negative' ? 'Error' : (${sentiment} === 'neutral' ? 'Information' : 'None')) }"/>
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentiment'}"
+                                state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentimentState'}"/>
                             <ObjectStatus
-                                text="{= ${priority} || '—' }"
-                                state="{= ${priority} === 'high' ? 'Error' : (${priority} === 'medium' ? 'Warning' : (${priority} === 'low' ? 'Success' : 'None')) }"/>
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriority'}"
+                                state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriorityState'}"/>
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -49,23 +49,26 @@
                 <HBox wrap="Wrap" alignItems="Center" class="sapUiSmallMargin">
                     <VBox class="sapUiSmallMarginEnd">
                         <Label text="{i18n>detail.language}" design="Bold"/>
-                        <ObjectStatus text="{= ${detectedLanguage} || '—' }" state="Information"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtLanguage'}"
+                            state="Information"/>
                     </VBox>
                     <VBox class="sapUiSmallMarginEnd">
                         <Label text="{i18n>detail.sentiment}" design="Bold"/>
                         <ObjectStatus
-                            text="{= ${sentiment} || '—' }"
-                            state="{= ${sentiment} === 'positive' ? 'Success' : (${sentiment} === 'negative' ? 'Error' : (${sentiment} === 'neutral' ? 'Information' : 'None')) }"/>
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentiment'}"
+                            state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentimentState'}"/>
                     </VBox>
                     <VBox class="sapUiSmallMarginEnd">
                         <Label text="{i18n>detail.category}" design="Bold"/>
-                        <ObjectStatus text="{= ${category} || '—' }"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtCategory'}"/>
                     </VBox>
                     <VBox class="sapUiSmallMarginEnd">
                         <Label text="{i18n>detail.priority}" design="Bold"/>
                         <ObjectStatus
-                            text="{= ${priority} || '—' }"
-                            state="{= ${priority} === 'high' ? 'Error' : (${priority} === 'medium' ? 'Warning' : (${priority} === 'low' ? 'Success' : 'None')) }"/>
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriority'}"
+                            state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriorityState'}"/>
                     </VBox>
                 </HBox>
             </f:DynamicPageHeader>
@@ -74,7 +77,9 @@
         <f:content>
             <VBox class="sapUiMediumMargin">
                 <Panel headerText="{i18n>detail.summary}" expandable="false" backgroundDesign="Solid">
-                    <Text text="{= ${summary} || 'Click Analyze to generate a summary.' }" class="sapUiSmallMargin"/>
+                    <Text
+                        text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSummaryOrHint'}"
+                        class="sapUiSmallMargin"/>
                 </Panel>
 
                 <Panel
