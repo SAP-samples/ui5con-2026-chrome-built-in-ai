@@ -1,0 +1,37 @@
+<mvc:View
+    controllerName="workshop.ticket.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns="sap.m">
+
+    <f:DynamicPage id="detailPage" toggleHeaderOnTitleClick="false">
+
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{subject}"/>
+                </f:heading>
+                <f:snappedContent>
+                    <Text text="{customer}"/>
+                </f:snappedContent>
+                <f:expandedContent>
+                    <Text text="{customer}"/>
+                </f:expandedContent>
+                <f:navigationActions>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        text="{i18n>button.back}"
+                        press=".onBack"/>
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:content>
+            <VBox class="sapUiMediumMargin">
+                <Panel headerText="{i18n>detail.body}" expandable="false" backgroundDesign="Solid">
+                    <Text text="{body}" class="sapUiSmallMargin"/>
+                </Panel>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

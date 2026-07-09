@@ -1,0 +1,53 @@
+{
+  "name": "ui5-chrome-ai-workshop",
+  "version": "0.1.0",
+  "description": "Hands-on workshop: UI5 app powered by Chrome's built-in AI APIs",
+  "author": "SAP SE",
+  "contributors": [
+    "SAP SE <*@sap.com>"
+  ],
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "concurrently -k -n cap,ui5 -c blue,magenta \"npm:start:cap\" \"npm:start:ui5\"",
+    "start:cap": "cds-serve",
+    "start:ui5": "cd webapp && ui5 serve --config ui5.yaml --open index.html",
+    "build": "cd webapp && ui5 build --clean-dest",
+    "lint": "cd webapp && ui5-linter"
+  },
+  "dependencies": {
+    "@cap-js/sqlite": "^2.4.0",
+    "@sap/cds": "^9",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^9",
+    "@types/dom-chromium-ai": "^0.0.7",
+    "@types/openui5": "^1.140.0",
+    "@ui5/cli": "^4",
+    "@ui5/linter": "^1",
+    "@ui5/ts-interface-generator": "^0.10.1",
+    "babel-plugin-transform-modules-ui5": "^7.8.1",
+    "concurrently": "^9",
+    "typescript": "^5.6",
+    "ui5-middleware-simpleproxy": "^3.8.0",
+    "ui5-tooling-transpile": "^3.11.3"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sql",
+        "impl": "@cap-js/sqlite",
+        "credentials": {
+          "url": ":memory:"
+        }
+      }
+    },
+    "hana": {
+      "deploy-format": "hdbtable"
+    }
+  },
+  "sapux": [
+    "webapp"
+  ]
+}

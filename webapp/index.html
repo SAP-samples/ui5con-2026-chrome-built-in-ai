@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Support Inbox — Chrome AI Triage</title>
+
+    <!--
+      Origin Trial tokens for Chrome APIs still in OT (as of July 2026):
+      - Writer / Rewriter (shared, feature 4712595362414592 / 5112320150470656)
+      - Proofreader (feature 5164677291835392)
+      Register your own tokens at https://developer.chrome.com/origintrials
+      and paste them below. The core demo (Summarizer / Translator /
+      LanguageDetector / LanguageModel) is stable in Chrome 148+ — no token needed.
+    -->
+    <!-- <meta http-equiv="origin-trial" content="YOUR_WRITER_REWRITER_OT_TOKEN_HERE"> -->
+
+    <script
+        id="sap-ui-bootstrap"
+        src="https://sdk.openui5.org/1.140.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-resource-roots='{ "workshop.ticket": "./" }'
+        data-sap-ui-oninit="module:workshop/ticket/index"
+        data-sap-ui-async="true"
+        data-sap-ui-preload="async"
+        data-sap-ui-xx-async-hints='{"components":{"workshop.ticket":{"preload":false}}}'
+        data-sap-ui-compatVersion="edge"
+    ></script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>

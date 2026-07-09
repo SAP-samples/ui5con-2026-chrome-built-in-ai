@@ -1,0 +1,48 @@
+<mvc:View
+    controllerName="workshop.ticket.controller.List"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+
+    <Page
+        id="listPage"
+        title="{i18n>listTitle}"
+        showNavButton="false">
+
+        <headerContent>
+            <Button
+                icon="sap-icon://refresh"
+                tooltip="{i18n>button.refresh}"
+                press=".onRefresh"/>
+        </headerContent>
+
+        <content>
+            <Table
+                id="ticketTable"
+                items="{
+                    path: '/Tickets',
+                    parameters: {
+                        $select: 'ID,subject,customer,body,submitted',
+                        $orderby: 'submitted desc'
+                    }
+                }"
+                growing="true"
+                growingThreshold="20"
+                mode="None">
+
+                <columns>
+                    <Column width="14rem"><Text text="{i18n>column.customer}"/></Column>
+                    <Column><Text text="{i18n>column.subject}"/></Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem type="Navigation" press=".onOpenDetail">
+                        <cells>
+                            <Text text="{customer}"/>
+                            <Text text="{subject}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

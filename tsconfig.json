@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "allowJs": false,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["@types/openui5", "@types/dom-chromium-ai"],
+    "outDir": "webapp",
+    "rootDir": "webapp",
+    "baseUrl": "./"
+  },
+  "include": ["webapp/**/*.ts"]
+}
