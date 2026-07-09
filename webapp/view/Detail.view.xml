@@ -17,6 +17,24 @@
                 <f:expandedContent>
                     <Text text="{customer}"/>
                 </f:expandedContent>
+                <f:actions>
+                    <Button
+                        text="{= ${detail>/showingTranslation} ? ${i18n>button.showOriginal} : ${i18n>button.translate} }"
+                        icon="sap-icon://translate"
+                        press=".onToggleTranslation"
+                        enabled="{= !${ai>/busy} }"/>
+                    <Button
+                        text="{i18n>button.analyze}"
+                        icon="sap-icon://ai"
+                        type="Emphasized"
+                        press=".onAnalyze"
+                        enabled="{= !${ai>/busy} }"/>
+                    <Button
+                        text="{i18n>button.draftReply}"
+                        icon="sap-icon://compose"
+                        press=".onDraftReply"
+                        enabled="{= !${ai>/busy} }"/>
+                </f:actions>
                 <f:navigationActions>
                     <Button
                         icon="sap-icon://nav-back"
@@ -26,10 +44,58 @@
             </f:DynamicPageTitle>
         </f:title>
 
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <HBox wrap="Wrap" alignItems="Center" class="sapUiSmallMargin">
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.language}" design="Bold"/>
+                        <ObjectStatus text="{= ${detectedLanguage} || '—' }" state="Information"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.sentiment}" design="Bold"/>
+                        <ObjectStatus
+                            text="{= ${sentiment} || '—' }"
+                            state="{= ${sentiment} === 'positive' ? 'Success' : (${sentiment} === 'negative' ? 'Error' : (${sentiment} === 'neutral' ? 'Information' : 'None')) }"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.category}" design="Bold"/>
+                        <ObjectStatus text="{= ${category} || '—' }"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.priority}" design="Bold"/>
+                        <ObjectStatus
+                            text="{= ${priority} || '—' }"
+                            state="{= ${priority} === 'high' ? 'Error' : (${priority} === 'medium' ? 'Warning' : (${priority} === 'low' ? 'Success' : 'None')) }"/>
+                    </VBox>
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+
         <f:content>
             <VBox class="sapUiMediumMargin">
-                <Panel headerText="{i18n>detail.body}" expandable="false" backgroundDesign="Solid">
-                    <Text text="{body}" class="sapUiSmallMargin"/>
+                <Panel headerText="{i18n>detail.summary}" expandable="false" backgroundDesign="Solid">
+                    <Text text="{= ${summary} || 'Click Analyze to generate a summary.' }" class="sapUiSmallMargin"/>
+                </Panel>
+
+                <Panel
+                    headerText="{= ${detail>/showingTranslation} ? ${i18n>detail.translated} : ${i18n>detail.body} }"
+                    expandable="false"
+                    class="sapUiSmallMarginTop"
+                    backgroundDesign="Solid">
+                    <Text text="{= ${detail>/showingTranslation} ? ${detail>/translatedBody} : ${body} }" class="sapUiSmallMargin"/>
+                </Panel>
+
+                <Panel
+                    visible="{= !!${detail>/draftedReply} }"
+                    headerText="{i18n>detail.reply}"
+                    expandable="false"
+                    class="sapUiSmallMarginTop"
+                    backgroundDesign="Solid">
+                    <TextArea
+                        value="{detail>/draftedReply}"
+                        rows="8"
+                        width="100%"
+                        class="sapUiSmallMargin"/>
                 </Panel>
             </VBox>
         </f:content>

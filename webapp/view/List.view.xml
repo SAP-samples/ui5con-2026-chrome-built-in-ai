@@ -1,6 +1,8 @@
 <mvc:View
     controllerName="workshop.ticket.controller.List"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
     xmlns="sap.m">
 
     <Page
@@ -9,6 +11,17 @@
         showNavButton="false">
 
         <headerContent>
+            <ObjectStatus
+                text="{= ${ai>/mock} ? 'MOCK MODE' : ${ai>/summarizer} }"
+                state="{= ${ai>/mock} ? 'Warning' : (${ai>/summarizer} === 'available' ? 'Success' : 'Error') }"
+                class="sapUiSmallMarginEnd"/>
+            <Button
+                id="btnAnalyzeAll"
+                text="{i18n>button.analyzeAll}"
+                type="Emphasized"
+                icon="sap-icon://ai"
+                press=".onAnalyzeAll"
+                enabled="{= !${ai>/busy} }"/>
             <Button
                 icon="sap-icon://refresh"
                 tooltip="{i18n>button.refresh}"
@@ -21,7 +34,7 @@
                 items="{
                     path: '/Tickets',
                     parameters: {
-                        $select: 'ID,subject,customer,body,submitted',
+                        $select: 'ID,subject,customer,body,submitted,detectedLanguage,summary,sentiment,category,priority',
                         $orderby: 'submitted desc'
                     }
                 }"
@@ -32,6 +45,10 @@
                 <columns>
                     <Column width="14rem"><Text text="{i18n>column.customer}"/></Column>
                     <Column><Text text="{i18n>column.subject}"/></Column>
+                    <Column width="8rem" hAlign="Center"><Text text="{i18n>column.language}"/></Column>
+                    <Column><Text text="{i18n>column.summary}"/></Column>
+                    <Column width="10rem" hAlign="Center"><Text text="{i18n>column.sentiment}"/></Column>
+                    <Column width="7rem" hAlign="Center"><Text text="{i18n>column.priority}"/></Column>
                 </columns>
 
                 <items>
@@ -39,6 +56,16 @@
                         <cells>
                             <Text text="{customer}"/>
                             <Text text="{subject}"/>
+                            <ObjectStatus
+                                text="{= ${detectedLanguage} || '—' }"
+                                state="{= ${detectedLanguage} ? 'Information' : 'None' }"/>
+                            <Text text="{= ${summary} || '' }" maxLines="2"/>
+                            <ObjectStatus
+                                text="{= ${sentiment} || '—' }"
+                                state="{= ${sentiment} === 'positive' ? 'Success' : (${sentiment} === 'negative' ? 'Error' : (${sentiment} === 'neutral' ? 'Information' : 'None')) }"/>
+                            <ObjectStatus
+                                text="{= ${priority} || '—' }"
+                                state="{= ${priority} === 'high' ? 'Error' : (${priority} === 'medium' ? 'Warning' : (${priority} === 'low' ? 'Success' : 'None')) }"/>
                         </cells>
                     </ColumnListItem>
                 </items>
