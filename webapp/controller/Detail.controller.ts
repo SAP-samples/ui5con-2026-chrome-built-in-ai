@@ -44,9 +44,52 @@ export default class Detail extends Controller {
             : (this.getOwnerComponent() as UIComponent).getRouter().navTo("list", {}, true);
     }
 
-    /** exercise-3 wires this to the Translator API */
+    /**
+     * Toggle between showing the original message body and its English
+     * translation. First press: detect the source language, translate to
+     * English, cache in the local `detail` model. Subsequent presses just
+     * flip the visibility flag.
+     */
     public async onToggleTranslation(): Promise<void> {
-        MessageToast.show("Translation not wired yet — see exercise-3");
+        if (this._detailModel.getProperty("/showingTranslation")) {
+            this._detailModel.setProperty("/showingTranslation", false);
+            return;
+        }
+
+        // If already translated once for this ticket, reuse it
+        if (this._detailModel.getProperty("/translatedBody")) {
+            this._detailModel.setProperty("/showingTranslation", true);
+            return;
+        }
+
+        const oCtx = this.getView()?.getBindingContext();
+        if (!oCtx) return;
+        const body: string = oCtx.getProperty("body");
+        const id: string = oCtx.getProperty("ID");
+        const oAiModel = (this.getOwnerComponent() as UIComponent).getModel("ai") as any;
+
+        oAiModel.setProperty("/busy", true);
+        try {
+            // Reuse a previously-detected language if we have one, else detect now
+            let lang: string = oAiModel.getProperty("/results")[id]?.language;
+            if (!lang || lang === "und") {
+                const detected = await ai.detectLanguage(body);
+                lang = detected[0]?.detectedLanguage ?? "en";
+            }
+
+            if (lang === "en") {
+                MessageToast.show("Already in English");
+                return;
+            }
+
+            const translated = await ai.translate(body, lang, "en");
+            this._detailModel.setProperty("/translatedBody", translated);
+            this._detailModel.setProperty("/showingTranslation", true);
+        } catch (err) {
+            MessageToast.show(`Translation failed: ${(err as Error).message}`);
+        } finally {
+            oAiModel.setProperty("/busy", false);
+        }
     }
 
     /**
