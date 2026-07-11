@@ -1,0 +1,42 @@
+specVersion: "3.0"
+metadata:
+  name: workshop.ticket
+type: application
+framework:
+  name: SAPUI5
+  version: "1.140.0"
+  libraries:
+    - name: sap.m
+    - name: sap.f
+    - name: sap.ui.core
+    - name: sap.ui.layout
+    - name: themelib_sap_horizon
+server:
+  customMiddleware:
+    - name: ui5-tooling-transpile-middleware
+      afterMiddleware: compression
+    - name: ui5-middleware-simpleproxy
+      afterMiddleware: compression
+      mountPath: /ticket
+      configuration:
+        baseUri: http://localhost:4004/ticket
+builder:
+  customTasks:
+    - name: ui5-tooling-transpile-task
+      afterTask: replaceVersion
+  bundles:
+    - bundleDefinition:
+        name: workshop/ticket/Component-preload.js
+        defaultFileTypes:
+          - .js
+          - .fragment.xml
+          - .view.xml
+          - .properties
+          - .json
+        sections:
+          - mode: preload
+            filters:
+              - workshop/ticket/
+              - workshop/ticket/manifest.json
+              - "!workshop/ticket/test/"
+            resolve: true

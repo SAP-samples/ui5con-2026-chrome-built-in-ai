@@ -1,0 +1,124 @@
+<mvc:View
+    controllerName="workshop.ticket.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns="sap.m">
+
+    <f:DynamicPage
+        id="detailPage"
+        toggleHeaderOnTitleClick="false"
+        busy="{ai>/busy}"
+        busyIndicatorDelay="0">
+
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{subject}"/>
+                </f:heading>
+                <f:snappedContent>
+                    <Text text="{customer}"/>
+                </f:snappedContent>
+                <f:expandedContent>
+                    <Text text="{customer}"/>
+                </f:expandedContent>
+                <f:actions>
+                    <Text
+                        visible="{= !!${ai>/busy} }"
+                        text="{ai>/busyText}"
+                        class="sapUiSmallMarginEnd"/>
+                    <ProgressIndicator
+                        visible="{= !!${ai>/busy} &amp;&amp; ${ai>/progress} &gt; 0 &amp;&amp; ${ai>/progress} &lt; 1 }"
+                        percentValue="{= ${ai>/progress} * 100 }"
+                        displayValue="{i18n>ai.progress}"
+                        showValue="true"
+                        state="Information"
+                        width="12rem"
+                        class="sapUiSmallMarginEnd"/>
+                    <Button
+                        text="{= ${detail>/showingTranslation} ? ${i18n>button.showOriginal} : ${i18n>button.translate} }"
+                        icon="sap-icon://translate"
+                        press=".onToggleTranslation"
+                        enabled="{= !${ai>/busy} }"/>
+                    <Button
+                        text="{i18n>button.analyze}"
+                        icon="sap-icon://ai"
+                        type="Emphasized"
+                        press=".onAnalyze"
+                        enabled="{= !${ai>/busy} }"/>
+                    <Button
+                        text="{i18n>button.draftReply}"
+                        icon="sap-icon://compose"
+                        press=".onDraftReply"
+                        enabled="{= !${ai>/busy} }"/>
+                </f:actions>
+                <f:navigationActions>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        text="{i18n>button.back}"
+                        press=".onBack"/>
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <HBox wrap="Wrap" alignItems="Center" class="sapUiSmallMargin">
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.language}" design="Bold"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtLanguage'}"
+                            state="Information"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.sentiment}" design="Bold"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentiment'}"
+                            state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentimentState'}"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.category}" design="Bold"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtCategory'}"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="{i18n>detail.priority}" design="Bold"/>
+                        <ObjectStatus
+                            text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriority'}"
+                            state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriorityState'}"/>
+                    </VBox>
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <VBox class="sapUiMediumMargin">
+                <Panel headerText="{i18n>detail.summary}" expandable="false" backgroundDesign="Solid">
+                    <Text
+                        text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSummaryOrHint'}"
+                        class="sapUiSmallMargin"/>
+                </Panel>
+
+                <Panel
+                    headerText="{= ${detail>/showingTranslation} ? ${i18n>detail.translated} : ${i18n>detail.body} }"
+                    expandable="false"
+                    class="sapUiSmallMarginTop"
+                    backgroundDesign="Solid">
+                    <Text text="{= ${detail>/showingTranslation} ? ${detail>/translatedBody} : ${body} }" class="sapUiSmallMargin"/>
+                </Panel>
+
+                <Panel
+                    visible="{= !!${detail>/draftedReply} }"
+                    headerText="{i18n>detail.reply}"
+                    expandable="false"
+                    class="sapUiSmallMarginTop"
+                    backgroundDesign="Solid">
+                    <TextArea
+                        value="{detail>/draftedReply}"
+                        rows="8"
+                        width="100%"
+                        class="sapUiSmallMargin"/>
+                </Panel>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

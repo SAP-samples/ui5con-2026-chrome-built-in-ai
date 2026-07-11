@@ -1,0 +1,44 @@
+import UIComponent from "sap/ui/core/UIComponent";
+import JSONModel from "sap/ui/model/json/JSONModel";
+import Device from "sap/ui/Device";
+
+/**
+ * @namespace workshop.ticket
+ */
+export default class Component extends UIComponent {
+    public static metadata = {
+        manifest: "json",
+        interfaces: ["sap.ui.core.IAsyncContentCreation"]
+    };
+
+    public init(): void {
+        super.init();
+
+        // Device model for responsive behaviour
+        const oDeviceModel = new JSONModel(Device);
+        oDeviceModel.setDefaultBindingMode("OneWay");
+        this.setModel(oDeviceModel, "device");
+
+        // AI status model — mirrors the state exposed by ai.ts
+        const oAiModel = new JSONModel({
+            summarizer: "unknown",
+            translator: "unknown",
+            languageDetector: "unknown",
+            languageModel: "unknown",
+            downloadPct: 0,
+            busy: false,
+            // Human-readable label for the current AI stage (e.g. "Summarizing 3 / 8")
+            busyText: "",
+            // 0..1 progress from Chrome model downloads (monitor.downloadprogress)
+            progress: 0,
+            mock: new URLSearchParams(location.search).has("mock"),
+            // Enrichment cache: results[ticketId] = { language, summary, sentiment, category, priority }
+            results: {}
+        });
+        oAiModel.setSizeLimit(1000);
+        this.setModel(oAiModel, "ai");
+
+        // Kick off routing after models are attached
+        this.getRouter().initialize();
+    }
+}

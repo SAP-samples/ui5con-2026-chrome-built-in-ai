@@ -1,0 +1,91 @@
+<mvc:View
+    controllerName="workshop.ticket.controller.List"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns="sap.m">
+
+    <Page
+        id="listPage"
+        title="{i18n>listTitle}"
+        showNavButton="false">
+
+        <headerContent>
+            <ObjectStatus
+                text="{= ${ai>/mock} ? 'MOCK MODE' : ${ai>/summarizer} }"
+                state="{= ${ai>/mock} ? 'Warning' : (${ai>/summarizer} === 'available' ? 'Success' : 'Error') }"
+                class="sapUiSmallMarginEnd"/>
+            <Text
+                visible="{= !!${ai>/busy} }"
+                text="{ai>/busyText}"
+                class="sapUiSmallMarginEnd"/>
+            <ProgressIndicator
+                visible="{= !!${ai>/busy} &amp;&amp; ${ai>/progress} &gt; 0 &amp;&amp; ${ai>/progress} &lt; 1 }"
+                percentValue="{= ${ai>/progress} * 100 }"
+                displayValue="{i18n>ai.progress}"
+                showValue="true"
+                state="Information"
+                width="14rem"
+                class="sapUiSmallMarginEnd"/>
+            <Button
+                id="btnAnalyzeAll"
+                text="{i18n>button.analyzeAll}"
+                type="Emphasized"
+                icon="sap-icon://ai"
+                press=".onAnalyzeAll"
+                enabled="{= !${ai>/busy} }"/>
+            <Button
+                icon="sap-icon://refresh"
+                tooltip="{i18n>button.refresh}"
+                press=".onRefresh"/>
+        </headerContent>
+
+        <content>
+            <Table
+                id="ticketTable"
+                busy="{ai>/busy}"
+                busyIndicatorDelay="0"
+                items="{
+                    path: '/Tickets',
+                    parameters: {
+                        $select: 'ID,subject,customer,body,submitted,detectedLanguage,summary,sentiment,category,priority',
+                        $orderby: 'submitted desc'
+                    }
+                }"
+                growing="true"
+                growingThreshold="20"
+                mode="None">
+
+                <columns>
+                    <Column width="14rem"><Text text="{i18n>column.customer}"/></Column>
+                    <Column><Text text="{i18n>column.subject}"/></Column>
+                    <Column width="8rem" hAlign="Center"><Text text="{i18n>column.language}"/></Column>
+                    <Column><Text text="{i18n>column.summary}"/></Column>
+                    <Column width="10rem" hAlign="Center"><Text text="{i18n>column.sentiment}"/></Column>
+                    <Column width="7rem" hAlign="Center"><Text text="{i18n>column.priority}"/></Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem type="Navigation" press=".onOpenDetail">
+                        <cells>
+                            <Text text="{customer}"/>
+                            <Text text="{subject}"/>
+                            <ObjectStatus
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtLanguage'}"
+                                state="Information"/>
+                            <Text
+                                maxLines="2"
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSummary'}"/>
+                            <ObjectStatus
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentiment'}"
+                                state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtSentimentState'}"/>
+                            <ObjectStatus
+                                text="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriority'}"
+                                state="{parts:[{path:'ID'},{path:'ai>/results'}], formatter:'.fmtPriorityState'}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

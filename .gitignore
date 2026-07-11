@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.tmp/
+gen/
+*.log
+.DS_Store
+.env
+.env.local
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
