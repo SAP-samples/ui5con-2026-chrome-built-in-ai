@@ -57,6 +57,19 @@ Both tracks share the same steps:
 - [docs/cheatsheet.md](docs/cheatsheet.md) — one-page Chrome AI API reference
 - [docs/troubleshooting.md](docs/troubleshooting.md) — top blockers and fixes
 
+### Chrome built-in AI API documentation
+
+Official docs for every Chrome built-in AI API used in this project (all called through
+`webapp/model/ai.ts`):
+
+- [Built-in AI overview](https://developer.chrome.com/docs/ai/built-in) — capabilities, hardware requirements, and how the on-device model is shared across APIs
+- [Summarizer API](https://developer.chrome.com/docs/ai/summarizer-api) — TL;DR summaries (`ai.summarize`)
+- [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) — detect the language of ticket text (`ai.detectLanguage`)
+- [Translator API](https://developer.chrome.com/docs/ai/translator-api) — English-pivot translation (`ai.translate`)
+- [Prompt API](https://developer.chrome.com/docs/ai/prompt-api) — `LanguageModel` with JSON-Schema structured output (`ai.classify`)
+- [Writer API](https://developer.chrome.com/docs/ai/writer-api) — draft support replies (`ai.draftReply`)
+- [Rewriter API](https://developer.chrome.com/docs/ai/rewriter-api) — companion to Writer for revising existing text
+
 ## No Chrome AI on your machine? Add `?mock=1`
 
 If your Chrome is corporate-managed (or you haven't downloaded the on-device model yet), the
