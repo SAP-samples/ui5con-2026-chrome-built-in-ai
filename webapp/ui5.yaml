@@ -20,6 +20,11 @@ server:
       mountPath: /ticket
       configuration:
         baseUri: http://localhost:4004/ticket
+        # The CAP TicketService requires an authenticated user. For the
+        # workshop we forward the mocked user "workshop" (configured under
+        # cds.requires.auth in package.json) via HTTP Basic. Dev-only.
+        username: workshop
+        password: ""
 builder:
   customTasks:
     - name: ui5-tooling-transpile-task

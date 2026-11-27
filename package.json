@@ -41,6 +41,14 @@
         "credentials": {
           "url": ":memory:"
         }
+      },
+      "auth": {
+        "kind": "mocked",
+        "users": {
+          "workshop": {
+            "roles": ["authenticated-user"]
+          }
+        }
       }
     },
     "hana": {
